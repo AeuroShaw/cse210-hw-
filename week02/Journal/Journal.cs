@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+public class Journal
+{
+    public List<Entry> _entries = new List<Entry>();
+
+    public void AddEntry(Entry entry)
+    {
+        _entries.Add(entry);
+    }
+
+    public void DisplayAll()
+    {
+        foreach (Entry entry in _entries)
+        {
+            entry.Display();
+        }
+    }
+
+    public void SaveToFile(string fileName)
+    {
+        using (StreamWriter outputFile = new StreamWriter(fileName))
+        {
+            foreach (Entry entry in _entries)
+            {
+                // Using safe separator
+                outputFile.WriteLine($"{entry._date}~|~{entry._mood}~|~{entry._promptText}~|~{entry._entryText}");
+            }
+        }
+    }
+
+    public void LoadFromFile(string fileName)
+    {
+        string[] lines = File.ReadAllLines(fileName);
+
+        _entries.Clear();
+
+        foreach (string line in lines)
+        {
+            string[] parts = line.Split("~|~");
+
+            Entry entry = new Entry();
+            entry._date = parts[0];
+            entry._mood = parts[1];
+            entry._promptText = parts[2];
+            entry._entryText = parts[3];
+
+            _entries.Add(entry);
+        }
+    }
+
+    // ⭐ NEW FEATURE: Search entries
+    public void SearchEntries(string keyword)
+    {
+        Console.WriteLine("Search Results:\n");
+
+        foreach (Entry entry in _entries)
+        {
+            if (entry._entryText.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                entry._promptText.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+            {
+                entry.Display();
+            }
+        }
+    }
+}
